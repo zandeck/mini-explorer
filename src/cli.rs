@@ -10,7 +10,11 @@ pub struct CLI {
     #[structopt(short, long)]
     pub ws: Uri,
     #[structopt(short, long)]
-    pub block: String,
+    pub block: Option<String>,
     #[structopt(short, long)]
-    pub slot: u64,
+    pub slot: Option<u64>,
+    #[structopt(short, long)]
+    pub mongodb: Option<String>,
+    #[structopt(short, long)]
+    pub db_name: Option<String>,
 }

@@ -6,7 +6,10 @@ use tokio_tungstenite::{
     tungstenite::Message,
 };
 
-use crate::data::{Args, PointOrOrigin, RResult, Request, Response};
+use crate::{
+    cli::CLI,
+    data::{Args, PointOrOrigin, RResult, Request, Response},
+};
 use tokio::sync::mpsc::Sender;
 use tracing::info;
 
@@ -18,12 +21,15 @@ pub struct Connection {
 }
 
 impl Connection {
-    pub fn new(ws: Uri, points: Vec<PointOrOrigin>, channel: Sender<RResult>) -> Self {
-        let mut points = points.clone();
-        points.push(PointOrOrigin::origin());
+    pub fn new(opt: &CLI, channel: Sender<RResult>) -> Self {
+        let mut points = vec![PointOrOrigin::origin()];
+        if let Some((slot, block)) = opt.slot.zip(opt.block.as_ref()) {
+            points.push(PointOrOrigin::point(slot, block.clone()));
+        };
+        points.reverse();
 
         Connection {
-            ws,
+            ws: opt.ws.clone(),
             points,
             channel,
         }
@@ -52,7 +58,7 @@ impl Connection {
         for _ in 1..1000 {
             let msg = self.query(Args::RequestNext);
             write.send(msg).await?;
-            info!("Send initial request");
+            // info!("Send initial request");
         }
 
         loop {

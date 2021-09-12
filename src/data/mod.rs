@@ -34,6 +34,17 @@ impl Block {
             _ => 0,
         }
     }
+
+    pub fn hash(&self) -> String {
+        match self {
+            Self::Shelley(block) => block.header.block_hash.clone(),
+            Self::Allegra(block) => block.header.block_hash.clone(),
+            Self::Mary(block) => block.header.block_hash.clone(),
+            Self::Alonzo(block) => block.header.block_hash.clone(),
+            Self::Byron(block) => block.header_hash.clone(),
+            _ => "".to_string(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
