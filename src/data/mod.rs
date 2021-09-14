@@ -1,3 +1,4 @@
+use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 
 pub mod alonzo;
@@ -27,6 +28,7 @@ pub enum Block {
 impl Block {
     pub fn slot(&self) -> u64 {
         match self {
+            Self::Byron(block) => block.header.block_height,
             Self::Shelley(block) => block.header.slot,
             Self::Allegra(block) => block.header.slot,
             Self::Mary(block) => block.header.slot,
@@ -35,15 +37,34 @@ impl Block {
         }
     }
 
+    pub fn epoch(&self) -> u64 {
+        match self {
+            Self::Byron(_) => self.slot() / 21600,
+            _ => (self.slot() - 4492799) / 432000 + 4492799 / 21600 + 1,
+        }
+    }
+
     pub fn hash(&self) -> String {
         match self {
-            Self::Shelley(block) => block.header.block_hash.clone(),
-            Self::Allegra(block) => block.header.block_hash.clone(),
-            Self::Mary(block) => block.header.block_hash.clone(),
-            Self::Alonzo(block) => block.header.block_hash.clone(),
             Self::Byron(block) => block.header_hash.clone(),
+            Self::Shelley(block) => block.header_hash.clone(),
+            Self::Allegra(block) => block.header_hash.clone(),
+            Self::Mary(block) => block.header_hash.clone(),
+            Self::Alonzo(block) => block.header_hash.clone(),
             _ => "".to_string(),
         }
+    }
+
+    pub fn timestamp(&self) -> DateTime<Local> {
+        let ts = 1506203091
+            + match self {
+                Self::Byron(block) => 20 * block.header.block_height,
+                Self::Shelley(block) => 4492799 * 20 + (block.header.slot - 4492799),
+                Self::Allegra(block) => 4492799 * 20 + (block.header.slot - 4492799),
+                Self::Mary(block) => 4492799 * 20 + (block.header.slot - 4492799),
+                Self::Alonzo(block) => 4492799 * 20 + (block.header.slot - 4492799),
+            } as i64;
+        Local.from_utc_datetime(&NaiveDateTime::from_timestamp(ts, 0))
     }
 }
 
@@ -78,6 +99,17 @@ pub struct Tip {
     pub hash: String,
     #[serde(rename = "blockNo")]
     pub block_no: u64,
+}
+
+impl Tip {
+    pub fn epoch(&self) -> u64 {
+        (self.slot - 4492799) / 432000 + 4492799 / 21600 + 1
+    }
+
+    pub fn timestamp(&self) -> DateTime<Local> {
+        let ts = 1506203091 + 4492799 * 20 + (self.slot - 4492799) as i64;
+        Local.from_utc_datetime(&NaiveDateTime::from_timestamp(ts, 0))
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -160,6 +192,21 @@ impl PointOrOrigin {
 
     pub fn origin() -> Self {
         Self::Origin("origin".to_string())
+    }
+
+    pub fn epoch(&self) -> u64 {
+        match self {
+            Self::Point(Point { slot, .. }) => (slot - 4492799) / 432000 + 4492799 / 21600 + 1,
+            _ => 1,
+        }
+    }
+
+    pub fn timestamp(&self) -> DateTime<Local> {
+        let ts = match self {
+            Self::Point(Point { slot, .. }) => 1506203091 + 4492799 * 20 + (slot - 4492799) as i64,
+            _ => 1506203091,
+        };
+        Local.from_utc_datetime(&NaiveDateTime::from_timestamp(ts, 0))
     }
 }
 

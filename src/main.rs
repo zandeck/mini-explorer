@@ -37,9 +37,10 @@ async fn main() -> Result<()> {
                 //     storage.insert_many(potential_storage).await?;
                 // }
                 if let Some(progress) = chain.sync() {
-                    warn!("Chain is not synced: {:.2}", progress);
+                    // warn!("Chain is not synced: {:.2}", progress);
                 } else {
                     info!("Chain is synced");
+                    return Ok(());
                 }
             }
             _ => (),
