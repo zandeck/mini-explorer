@@ -11,7 +11,16 @@ use shelley::{
     ShelleyBlockEra, ShelleyHeader, TxBodyAllegra, TxBodyMary, TxBodyShelley, TxMetadata,
 };
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug)]
+pub enum Era {
+    Byron,
+    Shelley,
+    Allegra,
+    Mary,
+    Alonzo,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Block {
     #[serde(rename = "byron")]
     Byron(ByronBlockEra<ByronHeader, TxBodyByron>),
@@ -66,34 +75,48 @@ impl Block {
             } as i64;
         Local.from_utc_datetime(&NaiveDateTime::from_timestamp(ts, 0))
     }
+
+    pub fn era(&self) -> Era {
+        use Era::*;
+        match self {
+            Self::Byron(_) => Byron,
+            Self::Shelley(_) => Shelley,
+            Self::Allegra(_) => Allegra,
+            Self::Mary(_) => Mary,
+            Self::Alonzo(_) => Alonzo,
+        }
+    }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Tx<Body> {
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Tx<Body>
+where
+    Body: Clone,
+{
     pub id: String,
     pub body: Body,
     pub metadata: Option<TxMetadata>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TxIn {
     #[serde(rename = "txId")]
     pub tx_id: String,
     pub index: u64,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TxOut {
     pub address: String,
     pub value: Value,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Value {
     pub coins: u64,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Tip {
     pub slot: u64,
     pub hash: String,
@@ -112,7 +135,7 @@ impl Tip {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ProtocolVersion {
     pub minor: u64,
     pub major: u64,

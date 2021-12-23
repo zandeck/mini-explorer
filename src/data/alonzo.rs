@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use crate::data::shelley::{Certificate, Mint, Update, ValidityInterval};
 use crate::data::{TxIn, Value};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TxBodyAlonzo {
     pub inputs: Vec<TxIn>,
     pub outputs: Vec<TxOutAlonzo>,
@@ -22,7 +22,7 @@ pub struct TxBodyAlonzo {
     pub required_extra_signatures: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TxOutAlonzo {
     pub address: String,
     pub value: Value,

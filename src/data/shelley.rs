@@ -3,15 +3,19 @@ use std::collections::HashMap;
 
 use crate::data::{ProtocolVersion, Tx, TxIn, TxOut};
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ShelleyBlockEra<BkHeader, TxBody> {
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ShelleyBlockEra<BkHeader, TxBody>
+where
+    BkHeader: Clone,
+    TxBody: Clone,
+{
     pub body: Vec<Tx<TxBody>>,
     pub header: BkHeader,
     #[serde(rename = "headerHash")]
     pub header_hash: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum Certificate {
     #[serde(rename = "stakeKeyRegistration")]
     StakeKeyRegistration(String),
@@ -49,7 +53,7 @@ pub enum Certificate {
     StakeKeyDeregistration(String),
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TxBodyAllegra {
     pub inputs: Vec<TxIn>,
     pub outputs: Vec<TxOut>,
@@ -61,7 +65,7 @@ pub struct TxBodyAllegra {
     pub update: Option<Update>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TxBodyMary {
     pub inputs: Vec<TxIn>,
     pub outputs: Vec<TxOut>,
@@ -73,7 +77,7 @@ pub struct TxBodyMary {
     pub update: Option<Update>,
     pub mint: Mint,
 }
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TxBodyShelley {
     pub inputs: Vec<TxIn>,
     pub outputs: Vec<TxOut>,
@@ -85,24 +89,24 @@ pub struct TxBodyShelley {
     pub update: Option<Update>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TxMetadata {
     pub hash: String,
     pub body: BlobMetadata,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BlobMetadata {
     pub blob: HashMap<String, serde_json::Value>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PoolMetaData {
     pub url: String,
     pub hash: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(untagged)]
 pub enum Relay {
     Ip {
@@ -116,19 +120,19 @@ pub enum Relay {
     },
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Mint {
     pub coins: u64,
     pub assets: HashMap<String, i64>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Update {
     pub proposal: HashMap<String, UpdateProposal>,
     pub epoch: u64,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UpdateProposal {
     #[serde(rename = "minFeeCoefficient")]
     pub min_fee_coefficient: Option<u64>,
@@ -166,7 +170,7 @@ pub struct UpdateProposal {
     pub min_pool_cost: Option<u64>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ValidityInterval {
     #[serde(rename = "invalidBefore")]
     pub invalid_before: Option<u64>,
@@ -174,7 +178,7 @@ pub struct ValidityInterval {
     pub invalid_hereafter: Option<u64>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ShelleyHeader {
     #[serde(rename = "blockHeight")]
     pub block_height: u64,
